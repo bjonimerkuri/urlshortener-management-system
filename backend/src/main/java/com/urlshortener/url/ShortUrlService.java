@@ -161,6 +161,10 @@ public class ShortUrlService {
     public UrlStatsResponse statsFor(AuthenticatedUser caller) {
         return shortUrlRepository.statsForOwner(caller.id(), clock.instant());
     }
+    @Transactional(readOnly = true)
+    public UrlStatsResponse analytics(AuthenticatedUser caller){
+        return shortUrlRepository.yearlyAnalytics(caller.id(), clock.instant());
+    }
 
     @Transactional(readOnly = true)
     public UrlStatsResponse globalStats() {

@@ -74,7 +74,7 @@ class RedirectControllerTest extends AbstractIntegrationTest {
     void redirect_returns410_forExpiredUrl() throws Exception {
         ShortUrl url = new ShortUrl("expired1", "https://example.com", owner,
                 Instant.now().minusSeconds(1), false);
-        url.markExpired();  // set status to EXPIRED so no REQUIRES_NEW transaction is needed
+        url.markExpired();
         shortUrlRepository.save(url);
 
         mockMvc.perform(get("/r/expired1"))

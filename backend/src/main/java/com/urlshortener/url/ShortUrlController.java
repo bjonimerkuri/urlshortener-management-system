@@ -74,6 +74,13 @@ public class ShortUrlController {
         return shortUrlService.statsFor(caller);
     }
 
+    @GetMapping("/analytics/yearly")
+    @Operation(summary = "Dashboard counters for your URLs: totals, active, inactive, expired and clicks")
+    public UrlStatsResponse analytics(@RequestParam(required = true) String year, AuthenticatedUser caller) {
+        return shortUrlService.analytics(caller);
+    }
+
+
     @GetMapping("/{id}")
     @Operation(summary = "Fetch one of your short URLs")
     @ApiResponse(responseCode = "404", description = "Not found, or not yours", content = @Content)

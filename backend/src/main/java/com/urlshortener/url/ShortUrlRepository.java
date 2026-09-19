@@ -85,4 +85,40 @@ public interface ShortUrlRepository extends JpaRepository<ShortUrl, UUID>, JpaSp
               from ShortUrl s
             """)
     UrlStatsResponse statsForAllOwners(@Param("now") Instant now);
+
+    @Query(
+        """
+        select new com.urlshortener.url.dto.AnalyticsUrl(
+            s.year,
+            count(s),
+            coalesce(sum(s.clickCount), 0L),
+            coalesce(avg(s.clickCount), 0.0),
+            (select new com.urlshortener.url.dto.ClickedUrl(
+                top.shortCode,
+                top.originalUrl,
+                top.clickCount)
+             from ShortUrl top
+             where top.owner.id = :ownerId
+             order by top.clickCount desc
+             limit 1),
+            (select new com.urlshortener.url.dto.ClickedUrl(
+                least.shortCode,
+                least.originalUrl,
+                least.clickCount)
+             from ShortUrl least
+             where least.owner.id = :ownerId
+             order by least.clickCount asc
+             limit 1),
+            (select new com.urlshortener.url.dto.StatusAnalytics(
+                s.status,:now
+                count(s),
+                coalesce(sum(s.clickCount), 0L),
+                coalesce(avg(s.clickCount), 0.0))
+             from ShortUrl s
+             where s.owner.id = :ownerId
+             group by s.status),
+            max(s.updatedAt))
+    )
+    """)
+    UrlStatsResponse yearlyAnalytics (@Param((("ownerId"))), @Param(("year")), @Param("now") Instant now)
 }
